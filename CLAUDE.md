@@ -4,7 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a SXSW 2025 hackathon project built with Next.js 15.5.5, React 19, TypeScript, and Tailwind CSS 4. The project uses the Next.js App Router architecture with Turbopack for fast development and builds.
+**PAIO** (Physical AI Monitoring and Ops Platform) is a SXSW 2025 hackathon project that provides a comprehensive dashboard for monitoring and managing deployed physical AI robots. The platform includes a critical safety feature called **Guardian** for robot oversight and intervention.
+
+Built with Next.js 15.5.5, React 19, TypeScript, and Tailwind CSS 4. The project uses the Next.js App Router architecture with Turbopack for fast development and builds.
+
+### Core Features
+
+- **Robot Monitoring Dashboard**: Real-time monitoring of deployed physical AI robots
+- **Guardian Safety System**: Safety and oversight features for robot operations
+- **Ops Platform**: Operational management tools for robot fleets
 
 ## Development Commands
 
