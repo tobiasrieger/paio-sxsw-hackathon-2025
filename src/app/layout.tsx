@@ -50,7 +50,14 @@ export default function RootLayout({
               </a>
             </nav>
           </aside>
-          <main className="flex-1 bg-white">{children}</main>
+          <main className="flex-1 bg-white relative">
+            <div className="absolute top-6 right-8">
+              <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
+                <span className="text-sm font-medium text-gray-700">TR</span>
+              </div>
+            </div>
+            {children}
+          </main>
         </div>
       </body>
     </html>
