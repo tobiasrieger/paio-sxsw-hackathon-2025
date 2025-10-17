@@ -1,3 +1,7 @@
+'use client';
+
+import WebcamFeed from './WebcamFeed';
+
 interface RobotCardProps {
   name: string;
   hardware: string;
@@ -6,6 +10,7 @@ interface RobotCardProps {
   batteryLevel: number; // 0-100
   taskProgress: string;
   status?: 'active' | 'idle' | 'charging' | 'error';
+  enableWebcam?: boolean;
 }
 
 export default function RobotCard({
@@ -16,6 +21,7 @@ export default function RobotCard({
   batteryLevel,
   taskProgress,
   status = 'active',
+  enableWebcam = false,
 }: RobotCardProps) {
   // Determine battery color based on level
   const getBatteryColor = (level: number) => {
@@ -80,27 +86,31 @@ export default function RobotCard({
         </div>
       </div>
 
-      {/* Video feed placeholder */}
+      {/* Video feed */}
       <div className="px-6 py-4">
         <div className="text-xs text-gray-500 mb-2">Video Feed</div>
-        <div className="bg-gray-100 border border-gray-200 aspect-video flex items-center justify-center">
-          <div className="text-center text-gray-400">
-            <svg
-              className="w-12 h-12 mx-auto mb-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-              />
-            </svg>
-            <span className="text-xs">Camera feed</span>
+        {enableWebcam ? (
+          <WebcamFeed />
+        ) : (
+          <div className="bg-gray-100 border border-gray-200 aspect-video flex items-center justify-center">
+            <div className="text-center text-gray-400">
+              <svg
+                className="w-12 h-12 mx-auto mb-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+              <span className="text-xs">Camera feed</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Map placeholder */}

@@ -19,6 +19,7 @@ export default function GuardianDashboardPage() {
             batteryLevel={87}
             taskProgress="Restocking aisle 3 (72%)"
             status="active"
+            enableWebcam={true}
           />
           <RobotCard
             name="G-782"
