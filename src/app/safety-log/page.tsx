@@ -44,6 +44,12 @@ export default function SafetyLogPage() {
     }
   };
 
+  const handleClearLog = () => {
+    if (window.confirm('Are you sure you want to clear all incident log entries? This action cannot be undone.')) {
+      clearLog();
+    }
+  };
+
   return (
     <div className="px-8 py-6">
       <div className="flex items-baseline gap-4 pb-6 border-b border-gray-200 mb-6">
@@ -52,6 +58,17 @@ export default function SafetyLogPage() {
           Safety incidents and warnings detected by Guardian AI system
         </p>
       </div>
+
+      {logEntries.length > 0 && (
+        <div className="mb-6">
+          <button
+            onClick={handleClearLog}
+            className="px-4 py-2 text-sm border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-gray-700"
+          >
+            Clear Log
+          </button>
+        </div>
+      )}
 
       <div className="max-w-screen-2xl">
         {logEntries.length === 0 ? (

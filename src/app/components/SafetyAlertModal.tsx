@@ -50,9 +50,16 @@ export default function SafetyAlertModal({
   const dotColor = status === 'unsafe' ? 'bg-red-500' : 'bg-yellow-500';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+      {/* Darkened background overlay */}
+      <div
+        className="absolute inset-0"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
       {/* Alert Card */}
-      <div className={`bg-white border ${borderColor} shadow-lg max-w-2xl w-full`}>
+      <div className={`relative bg-white border ${borderColor} shadow-lg max-w-2xl w-full`}>
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-start justify-between gap-3">
@@ -88,9 +95,9 @@ export default function SafetyAlertModal({
         {/* Content */}
         <div className="px-6 py-5 space-y-4">
           {/* Human Pilot Required */}
-          <div className="bg-gray-50 border border-gray-200 px-4 py-3 text-center">
-            <p className="text-lg font-medium text-gray-900">
-              Human pilot intervention required
+          <div className="bg-yellow-50 border border-yellow-300 px-4 py-3 text-center">
+            <p className="text-lg font-bold text-yellow-900">
+              Human Pilot Intervention Required
             </p>
           </div>
           {/* Robot and Confidence */}
