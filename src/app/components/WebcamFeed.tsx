@@ -44,12 +44,16 @@ export default function WebcamFeed() {
     setIsActive(false);
   };
 
+  const handleCheckSafety = () => {
+    // TODO: Implement safety check
+  };
+
   return (
     <div>
       {/* Video display area */}
-      <div className="bg-black border border-gray-200 aspect-video overflow-hidden relative">
+      <div className="bg-gray-100 border border-gray-200 aspect-video overflow-hidden relative">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
             <div className="text-center text-gray-400">
               <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
               <span className="text-xs">Loading webcam...</span>
@@ -77,7 +81,7 @@ export default function WebcamFeed() {
           </div>
         )}
         {!isActive && !loading && !error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
             <div className="text-center text-gray-400">
               <svg
                 className="w-12 h-12 mx-auto mb-2"
@@ -105,24 +109,30 @@ export default function WebcamFeed() {
         />
       </div>
 
-      {/* Control button */}
-      <div className="mt-3">
+      {/* Control buttons */}
+      <div className="mt-3 flex justify-center gap-2">
         {!isActive ? (
           <button
             onClick={startWebcam}
             disabled={loading}
-            className="px-4 py-2 bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 border border-gray-200 bg-white text-gray-700 text-xs hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Starting...' : 'Start Camera'}
           </button>
         ) : (
           <button
             onClick={stopWebcam}
-            className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+            className="px-3 py-1.5 border border-gray-200 bg-white text-gray-700 text-xs hover:bg-gray-50 transition-colors"
           >
             Stop Camera
           </button>
         )}
+        <button
+          onClick={handleCheckSafety}
+          className="px-3 py-1.5 border border-gray-200 bg-white text-gray-700 text-xs hover:bg-gray-50 transition-colors"
+        >
+          Check Safety
+        </button>
       </div>
     </div>
   );
