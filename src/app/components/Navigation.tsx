@@ -9,6 +9,7 @@ export default function Navigation() {
   const menuItems = [
     { href: '/why-robotics', label: 'Why robotics?' },
     { href: '/guardian-dashboard', label: 'Guardian Dashboard' },
+    { href: '/safety-log', label: 'Safety Log' },
   ];
 
   return (

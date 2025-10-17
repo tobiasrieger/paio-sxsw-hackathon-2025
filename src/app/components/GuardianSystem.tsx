@@ -10,7 +10,7 @@ interface SafetyCheckResult {
   recommendations: string[];
 }
 
-export default function WebcamFeed() {
+export default function GuardianSystem() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const shouldContinueCheckingRef = useRef(false);
