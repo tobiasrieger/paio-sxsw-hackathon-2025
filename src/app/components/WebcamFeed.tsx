@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 interface SafetyCheckResult {
   safe: boolean;
@@ -13,10 +13,12 @@ interface SafetyCheckResult {
 export default function WebcamFeed() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const shouldContinueCheckingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [isContinuousChecking, setIsContinuousChecking] = useState(false);
   const [checkStatus, setCheckStatus] = useState<string>('');
   const [checkError, setCheckError] = useState<string | null>(null);
   const [safetyResult, setSafetyResult] = useState<SafetyCheckResult | null>(null);
@@ -46,6 +48,11 @@ export default function WebcamFeed() {
   };
 
   const stopWebcam = () => {
+    // Stop continuous checking if active
+    if (isContinuousChecking) {
+      stopContinuousChecking();
+    }
+
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -75,18 +82,10 @@ export default function WebcamFeed() {
     return canvas.toDataURL('image/jpeg', 0.8);
   };
 
-  const handleCheckSafety = async () => {
-    if (!isActive) {
-      setCheckError('Please start the camera first');
-      return;
-    }
-
-    setChecking(true);
-    setCheckError(null);
-    setSafetyResult(null);
-    setCheckStatus('');
-
+  const performSingleCheck = async (): Promise<boolean> => {
     try {
+      setCheckError(null);
+
       // Step 1: Capture frame
       setCheckStatus('Capturing frame from webcam');
       const imageData = captureFrame();
@@ -123,14 +122,54 @@ export default function WebcamFeed() {
       const result = await response.json();
 
       setSafetyResult(result);
+      return true;
     } catch (err) {
       console.error('Error checking safety:', err);
       setCheckError(err instanceof Error ? err.message : 'Failed to check safety');
-    } finally {
-      setChecking(false);
-      setCheckStatus('');
+      return false;
     }
   };
+
+  const startContinuousChecking = async () => {
+    if (!isActive) {
+      setCheckError('Please start the camera first');
+      return;
+    }
+
+    setIsContinuousChecking(true);
+    setChecking(true);
+    shouldContinueCheckingRef.current = true;
+    setSafetyResult(null);
+
+    while (shouldContinueCheckingRef.current) {
+      await performSingleCheck();
+
+      if (!shouldContinueCheckingRef.current) break;
+
+      // Wait 1 second before next check
+      setCheckStatus('Waiting 1 second before next check');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    setChecking(false);
+    setCheckStatus('');
+  };
+
+  const stopContinuousChecking = () => {
+    shouldContinueCheckingRef.current = false;
+    setIsContinuousChecking(false);
+    setChecking(false);
+    setCheckStatus('');
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (isContinuousChecking) {
+        stopContinuousChecking();
+      }
+    };
+  }, []);
 
   return (
     <div>
@@ -212,11 +251,11 @@ export default function WebcamFeed() {
           </button>
         )}
         <button
-          onClick={handleCheckSafety}
-          disabled={checking || !isActive}
+          onClick={isContinuousChecking ? stopContinuousChecking : startContinuousChecking}
+          disabled={!isActive}
           className="px-3 py-1.5 border border-gray-200 bg-white text-gray-700 text-xs hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {checking ? 'Checking...' : 'Check Safety'}
+          {isContinuousChecking ? 'Stop Checking Safety' : 'Start Checking Safety'}
         </button>
       </div>
 
