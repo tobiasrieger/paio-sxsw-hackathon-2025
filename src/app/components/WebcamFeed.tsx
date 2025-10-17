@@ -2,12 +2,23 @@
 
 import { useRef, useState } from 'react';
 
+interface SafetyCheckResult {
+  safe: boolean;
+  confidence: number;
+  summary: string;
+  concerns: string[];
+  recommendations: string[];
+}
+
 export default function WebcamFeed() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [checkError, setCheckError] = useState<string | null>(null);
+  const [safetyResult, setSafetyResult] = useState<SafetyCheckResult | null>(null);
 
   const startWebcam = async () => {
     setLoading(true);
@@ -44,8 +55,63 @@ export default function WebcamFeed() {
     setIsActive(false);
   };
 
-  const handleCheckSafety = () => {
-    // TODO: Implement safety check
+  const captureFrame = (): string | null => {
+    if (!videoRef.current) {
+      return null;
+    }
+
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return null;
+    }
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', 0.8);
+  };
+
+  const handleCheckSafety = async () => {
+    if (!isActive) {
+      setCheckError('Please start the camera first');
+      return;
+    }
+
+    setChecking(true);
+    setCheckError(null);
+    setSafetyResult(null);
+
+    try {
+      const imageData = captureFrame();
+
+      if (!imageData) {
+        throw new Error('Failed to capture frame from webcam');
+      }
+
+      const response = await fetch('/api/check-safety', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ image: imageData }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Safety check failed');
+      }
+
+      const result = await response.json();
+      setSafetyResult(result);
+    } catch (err) {
+      console.error('Error checking safety:', err);
+      setCheckError(err instanceof Error ? err.message : 'Failed to check safety');
+    } finally {
+      setChecking(false);
+    }
   };
 
   return (
@@ -129,11 +195,88 @@ export default function WebcamFeed() {
         )}
         <button
           onClick={handleCheckSafety}
-          className="px-3 py-1.5 border border-gray-200 bg-white text-gray-700 text-xs hover:bg-gray-50 transition-colors"
+          disabled={checking || !isActive}
+          className="px-3 py-1.5 border border-gray-200 bg-white text-gray-700 text-xs hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Check Safety
+          {checking ? 'Checking...' : 'Check Safety'}
         </button>
       </div>
+
+      {/* Safety Check Results */}
+      {checkError && (
+        <div className="mt-3 p-3 border border-red-200 bg-red-50">
+          <div className="flex items-start gap-2">
+            <svg
+              className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <div className="text-xs text-red-700">{checkError}</div>
+          </div>
+        </div>
+      )}
+
+      {safetyResult && (
+        <div className="mt-3 p-4 border border-gray-200 bg-white space-y-3">
+          {/* Status Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  safetyResult.safe ? 'bg-green-500' : 'bg-red-500'
+                }`}
+              />
+              <span className="text-sm font-medium">
+                {safetyResult.safe ? 'Safe' : 'Safety Concern'}
+              </span>
+            </div>
+            <span className="text-xs text-gray-500">
+              Confidence: {safetyResult.confidence}%
+            </span>
+          </div>
+
+          {/* Summary */}
+          <div className="text-sm text-gray-700">{safetyResult.summary}</div>
+
+          {/* Concerns */}
+          {safetyResult.concerns && safetyResult.concerns.length > 0 && (
+            <div className="space-y-1">
+              <div className="text-xs font-medium text-gray-900">Concerns:</div>
+              <ul className="space-y-1">
+                {safetyResult.concerns.map((concern, index) => (
+                  <li key={index} className="text-xs text-gray-600 flex items-start gap-2">
+                    <span className="text-red-500 flex-shrink-0">•</span>
+                    <span>{concern}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Recommendations */}
+          {safetyResult.recommendations && safetyResult.recommendations.length > 0 && (
+            <div className="space-y-1">
+              <div className="text-xs font-medium text-gray-900">Recommendations:</div>
+              <ul className="space-y-1">
+                {safetyResult.recommendations.map((recommendation, index) => (
+                  <li key={index} className="text-xs text-gray-600 flex items-start gap-2">
+                    <span className="text-blue-500 flex-shrink-0">→</span>
+                    <span>{recommendation}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
