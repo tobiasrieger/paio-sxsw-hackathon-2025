@@ -90,7 +90,7 @@ export default function RobotCard({
       <div className="px-6 py-4">
         <div className="text-xs text-gray-500 mb-2">Video Feed</div>
         {enableWebcam ? (
-          <GuardianSystem />
+          <GuardianSystem robotName={name} />
         ) : (
           <div className="bg-gray-100 border border-gray-200 aspect-video flex items-center justify-center">
             <div className="text-center text-gray-400">

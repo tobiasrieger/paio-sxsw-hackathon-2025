@@ -1,6 +1,8 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
+import { useSafetyLog } from '../contexts/SafetyLogContext';
+import SafetyAlertModal from './SafetyAlertModal';
 
 interface SafetyCheckResult {
   safe: boolean;
@@ -10,7 +12,12 @@ interface SafetyCheckResult {
   recommendations: string[];
 }
 
-export default function GuardianSystem() {
+interface GuardianSystemProps {
+  robotName?: string;
+}
+
+export default function GuardianSystem({ robotName = 'Unknown Robot' }: GuardianSystemProps) {
+  const { addLogEntry } = useSafetyLog();
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const shouldContinueCheckingRef = useRef(false);
@@ -22,6 +29,8 @@ export default function GuardianSystem() {
   const [checkStatus, setCheckStatus] = useState<string>('');
   const [checkError, setCheckError] = useState<string | null>(null);
   const [safetyResult, setSafetyResult] = useState<SafetyCheckResult | null>(null);
+  const [alertData, setAlertData] = useState<SafetyCheckResult | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
 
   const startWebcam = async () => {
     setLoading(true);
@@ -122,6 +131,31 @@ export default function GuardianSystem() {
       const result = await response.json();
 
       setSafetyResult(result);
+
+      // Determine status based on result
+      let status: 'safe' | 'warning' | 'unsafe' = 'safe';
+      if (!result.safe) {
+        status = 'unsafe';
+      } else if (result.concerns && result.concerns.length > 0) {
+        status = 'warning';
+      }
+
+      // Only log incidents (warnings and unsafe conditions)
+      if (status === 'warning' || status === 'unsafe') {
+        addLogEntry({
+          robot: robotName,
+          status,
+          confidence: result.confidence,
+          summary: result.summary,
+          concerns: result.concerns || [],
+          recommendations: result.recommendations || [],
+        });
+
+        // Trigger alert
+        setAlertData(result);
+        setShowAlert(true);
+      }
+
       return true;
     } catch (err) {
       console.error('Error checking safety:', err);
@@ -162,11 +196,15 @@ export default function GuardianSystem() {
     setCheckStatus('');
   };
 
-  // Cleanup on unmount
+  // Cleanup on unmount - stop camera and checking when navigating away
   useEffect(() => {
     return () => {
-      if (isContinuousChecking) {
-        stopContinuousChecking();
+      // Stop continuous checking
+      shouldContinueCheckingRef.current = false;
+
+      // Stop webcam stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
@@ -341,6 +379,20 @@ export default function GuardianSystem() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Safety Alert Modal */}
+      {alertData && (
+        <SafetyAlertModal
+          isOpen={showAlert}
+          onClose={() => setShowAlert(false)}
+          robot={robotName}
+          status={alertData.safe ? 'warning' : 'unsafe'}
+          summary={alertData.summary}
+          concerns={alertData.concerns || []}
+          recommendations={alertData.recommendations || []}
+          confidence={alertData.confidence}
+        />
       )}
     </div>
   );
