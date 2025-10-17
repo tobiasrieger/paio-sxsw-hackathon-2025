@@ -110,28 +110,10 @@ export default function WhyRoboticsPage() {
         <div className="py-6 bg-gray-50">
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="text-xs text-gray-500 mb-4 font-mono">Section 04</div>
-            <div className="min-h-[200px]">
-              {/* Content will be added here */}
-            </div>
-          </div>
-        </div>
-
-        {/* Section 05 */}
-        <div className="py-6 bg-white">
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="text-xs text-gray-500 mb-4 font-mono">Section 05</div>
-            <div className="min-h-[200px]">
-              {/* Content will be added here */}
-            </div>
-          </div>
-        </div>
-
-        {/* Section 06 */}
-        <div className="py-6 bg-gray-50">
-          <div className="max-w-screen-2xl mx-auto px-8">
-            <div className="text-xs text-gray-500 mb-4 font-mono">Section 06</div>
-            <div className="min-h-[200px]">
-              {/* Content will be added here */}
+            <div className="min-h-[200px] flex items-center justify-center">
+              <h2 className="text-2xl font-light tracking-tight text-center max-w-4xl">
+                Deployment and integration are hard, and safety when working among human is a concern
+              </h2>
             </div>
           </div>
         </div>
