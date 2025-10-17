@@ -14,8 +14,10 @@ export default function WhyRoboticsPage() {
         <div className="pt-6 pb-6 bg-white">
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="text-xs text-gray-500 mb-4 font-mono">Section 01</div>
-            <div className="min-h-[200px]">
-              {/* Content will be added here */}
+            <div className="min-h-[200px] flex items-center justify-center">
+              <h2 className="text-4xl font-light tracking-tight text-center max-w-4xl">
+                Within four years, robots will stock the shelves at Woolies
+              </h2>
             </div>
           </div>
         </div>
@@ -25,7 +27,20 @@ export default function WhyRoboticsPage() {
           <div className="max-w-screen-2xl mx-auto px-8">
             <div className="text-xs text-gray-500 mb-4 font-mono">Section 02</div>
             <div className="min-h-[200px]">
-              {/* Content will be added here */}
+              <h2 className="text-2xl font-light tracking-tight mb-6 text-center">Core Beliefs</h2>
+              <div className="flex justify-center">
+                <div className="grid grid-cols-3 gap-4 max-w-2xl">
+                  <div className="border border-gray-200 bg-white w-32 h-32 flex items-center justify-center p-4">
+                    <p className="text-center text-xs">The world is anthropocentric</p>
+                  </div>
+                  <div className="border border-gray-200 bg-white w-32 h-32 flex items-center justify-center p-4">
+                    <p className="text-center text-xs">General solutions bring cost down</p>
+                  </div>
+                  <div className="border border-gray-200 bg-white w-32 h-32 flex items-center justify-center p-4">
+                    <p className="text-center text-xs">Intelligence fixes all shortcomings</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
