@@ -88,16 +88,16 @@ export default function WhyRoboticsPage() {
                   <h3 className="text-lg font-light mb-4">Policy Models</h3>
                   <div className="space-y-3">
                     <div className="border border-gray-200 bg-white p-4">
+                      <p className="text-sm font-medium">Gemini Robotics 1.5</p>
+                      <p className="text-xs text-gray-500 mt-1">September 2025</p>
+                    </div>
+                    <div className="border border-gray-200 bg-white p-4">
                       <p className="text-sm font-medium">NVIDIA GR00T N1.5</p>
-                      <p className="text-xs text-gray-500 mt-1">Q4 2024</p>
+                      <p className="text-xs text-gray-500 mt-1">May 2025</p>
                     </div>
                     <div className="border border-gray-200 bg-white p-4">
                       <p className="text-sm font-medium">Physical Intelligence 0.5</p>
-                      <p className="text-xs text-gray-500 mt-1">Q3 2024</p>
-                    </div>
-                    <div className="border border-gray-200 bg-white p-4">
-                      <p className="text-sm font-medium">Gemini Robotics 1.5</p>
-                      <p className="text-xs text-gray-500 mt-1">Q2 2024</p>
+                      <p className="text-xs text-gray-500 mt-1">April 2025</p>
                     </div>
                   </div>
                 </div>
