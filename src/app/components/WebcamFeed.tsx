@@ -17,6 +17,7 @@ export default function WebcamFeed() {
   const [loading, setLoading] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [checkStatus, setCheckStatus] = useState<string>('');
   const [checkError, setCheckError] = useState<string | null>(null);
   const [safetyResult, setSafetyResult] = useState<SafetyCheckResult | null>(null);
 
@@ -83,15 +84,23 @@ export default function WebcamFeed() {
     setChecking(true);
     setCheckError(null);
     setSafetyResult(null);
+    setCheckStatus('');
 
     try {
+      // Step 1: Capture frame
+      setCheckStatus('Capturing frame from webcam');
       const imageData = captureFrame();
 
       if (!imageData) {
         throw new Error('Failed to capture frame from webcam');
       }
 
-      const response = await fetch('/api/check-safety', {
+      // Step 2: Encoding
+      setCheckStatus('Encoding image data');
+
+      // Step 3: Sending request
+      setCheckStatus('Sending request to Gemini AI');
+      const responsePromise = fetch('/api/check-safety', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,18 +108,27 @@ export default function WebcamFeed() {
         body: JSON.stringify({ image: imageData }),
       });
 
+      // Step 4: Waiting for response
+      setCheckStatus('Waiting for response');
+
+      const response = await responsePromise;
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Safety check failed');
       }
 
+      // Step 5: Processing response
+      setCheckStatus('Processing results');
       const result = await response.json();
+
       setSafetyResult(result);
     } catch (err) {
       console.error('Error checking safety:', err);
       setCheckError(err instanceof Error ? err.message : 'Failed to check safety');
     } finally {
       setChecking(false);
+      setCheckStatus('');
     }
   };
 
@@ -201,6 +219,14 @@ export default function WebcamFeed() {
           {checking ? 'Checking...' : 'Check Safety'}
         </button>
       </div>
+
+      {/* Status Line */}
+      {checking && checkStatus && (
+        <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
+          <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+          <span>{checkStatus}</span>
+        </div>
+      )}
 
       {/* Safety Check Results */}
       {checkError && (
