@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <SafetyLogProvider>
           <div className="flex min-h-screen">
-            <aside className="w-64 border-r border-gray-200 bg-white">
+            <aside className="w-64 border-r border-gray-200 bg-white fixed h-screen overflow-y-auto">
               <div className="px-6 pt-6 pb-3">
                 <h1 className="text-2xl font-bold tracking-tight italic">PAIO</h1>
                 <p className="text-sm text-gray-600 tracking-tight mt-1">
@@ -40,7 +40,7 @@ export default function RootLayout({
               </div>
               <Navigation />
             </aside>
-            <main className="flex-1 bg-white relative">
+            <main className="flex-1 bg-white relative ml-64">
               <div className="absolute top-6 right-8">
                 <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
                   <span className="text-sm font-medium text-gray-700">TR</span>
